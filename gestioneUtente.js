@@ -102,10 +102,21 @@ function createTable(data) {
       // Se no, stampa un messaggio indicando che non ha ruoli definiti
       roleCell.textContent = "Nessun ruolo definito";
     }
+    // Creazione del pulsante Elimina e associazione dell'evento click
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Elimina";
+    deleteButton.classList.add("btn", "btn-danger");
+    deleteButton.addEventListener("click", function () {
+      deleteUtente(item.email); // Chiamata alla funzione deleteUtente con l'email dell'utente
+    });
+    // Creazione della cella per il pulsante Elimina
+    const deleteCell = document.createElement("td");
+    deleteCell.appendChild(deleteButton);
     row.appendChild(firstNameCell);
     row.appendChild(lastNameCell);
     row.appendChild(emailCell);
     row.appendChild(roleCell);
+    row.appendChild(deleteCell);
     tbody.appendChild(row);
   });
   table.appendChild(tbody);
@@ -145,3 +156,66 @@ function createList(data) {
   // Aggiungi la lista al contenitore
   listContainer.appendChild(ul);
 }
+
+/*
+// Funzione per eliminare un utente
+async function deleteUtente(userEmail) {
+  try {
+    // Effettua una chiamata GET per ottenere tutti gli utenti
+    const response = await fetch(`http://localhost:8080/api/utente/all`);
+
+    // Verifica che la risposta sia ok (status 200)
+    if (!response.ok) {
+      throw new Error(`Errore durante il recupero degli utenti!`);
+    }
+
+    // Estrae il JSON dalla risposta
+    const utenti = await response.json();
+
+    // Trova l'indice dell'utente da eliminare nell'array
+    const index = utenti.findIndex(user => user.email === userEmail);
+
+    // Verifica se l'utente è stato trovato
+    if (index !== -1) {
+      // Elimina l'utente dall'array
+      utenti.splice(index, 1);
+
+      // Ricrea la tabella con gli utenti aggiornati
+      createTable(utenti);
+
+      // Effettua una chiamata PUT per aggiornare gli utenti nel server
+      await fetch(`http://localhost:8080/api/utente/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(utenti)
+      });
+    } else {
+      console.error(`L'utente con email ${userEmail} non è stato trovato.`);
+    }
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione dell\'utente:', error);
+  }
+}*/
+
+// Funzione per eliminare un utente
+async function deleteUtente(userEmail) {
+  try {
+    // Effettua una chiamata DELETE all'endpoint per eliminare l'utente con l'email specificato
+    const response = await fetch(`http://localhost:8080/api/utente/delete/${userEmail}`, {
+      method: 'DELETE'
+    });
+
+    // Verifica che la risposta sia ok (status 200)
+    if (!response.ok) {
+      throw new Error(`Errore durante l'eliminazione dell'utente!`);
+    }
+
+    // Ricarica la tabella degli utenti dopo l'eliminazione
+    getDatiUtenti();
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione dell\'utente:', error);
+  }
+}
+
